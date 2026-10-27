@@ -2,6 +2,7 @@
 ## Projects
 - Mini futbol: A fun little futbol game with various 1 player difficulties ranging from Easy, Medium, and Hard "named Prime Messi" as well as a 2-player mode
 - [Recursion Visualizer](recursion-visualizer.html)
+- [Safety, Law & Ethics Lab](safety-law-ethics.html)
 - [Download football_game.py](football_game.py)
 ## About Me
 Click here to learn more → [About Me](about.md)

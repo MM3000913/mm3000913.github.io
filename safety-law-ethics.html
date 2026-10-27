@@ -1,0 +1,784 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f2f3ec">
+  <title>Safety, Law & Ethics Lab | MM3000913</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f2f3ec;
+      --white: #fffefa;
+      --ink: #1c2922;
+      --muted: #647168;
+      --line: #d7ddd4;
+      --green: #245c43;
+      --green-soft: #e0ebe2;
+      --orange: #bf603e;
+      --orange-soft: #f2e3d8;
+      --blue: #477992;
+      --blue-soft: #e0eaed;
+      --yellow: #e2bd59;
+      --mono: "DM Mono", Consolas, monospace;
+      --sans: "DM Sans", "Segoe UI", sans-serif;
+      --serif: "Fraunces", Georgia, serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background-color: var(--paper);
+      background-image: radial-gradient(#cfd5ca 0.7px, transparent 0.7px);
+      background-size: 19px 19px;
+      font: 14px/1.55 var(--sans);
+    }
+
+    button, select, input, textarea { font: inherit; }
+    button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible, a:focus-visible {
+      outline: 3px solid var(--orange);
+      outline-offset: 3px;
+    }
+
+    a { color: var(--green); }
+    a:hover { color: var(--orange); }
+    .shell { width: min(1180px, calc(100% - 44px)); margin: 0 auto; }
+
+    .masthead {
+      min-height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--green);
+      font: 500 11px var(--mono);
+      letter-spacing: 0;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
+    .brand-mark {
+      width: 25px;
+      height: 25px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--green);
+      border-radius: 50%;
+      font: 500 14px var(--serif);
+    }
+
+    .top-links { display: flex; align-items: center; gap: 20px; }
+    .top-links a { color: var(--muted); font-size: 12px; text-decoration: none; }
+    .top-links a:hover { color: var(--green); }
+
+    .intro {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(230px, 0.62fr);
+      gap: 36px;
+      align-items: end;
+      padding: 34px 0 25px;
+    }
+
+    .kicker, .section-index {
+      margin: 0 0 8px;
+      color: var(--green);
+      font: 500 10px var(--mono);
+      text-transform: uppercase;
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+    h1 {
+      max-width: 720px;
+      margin-bottom: 10px;
+      font: 500 44px/1.07 var(--serif);
+    }
+
+    .dek { max-width: 650px; margin-bottom: 0; color: #435249; font-size: 15px; }
+    .standard-note { padding-left: 17px; border-left: 2px solid var(--orange); color: var(--muted); font-size: 12px; }
+    .standard-note strong { display: block; margin-bottom: 4px; color: var(--ink); font: 500 10px var(--mono); text-transform: uppercase; }
+
+    .section {
+      margin-top: 12px;
+      padding: 20px 0 24px;
+      border-top: 1px solid var(--line);
+    }
+
+    .section-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 15px;
+    }
+
+    .section-head h2 { margin: 0; font: 500 25px/1.2 var(--serif); }
+    .section-head p { max-width: 500px; margin: 0; color: var(--muted); font-size: 12px; }
+    .scenario-copy { max-width: 760px; margin: 0 0 15px; font-size: 15px; }
+
+    .choice-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .choice {
+      min-height: 92px;
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      color: var(--ink);
+      background: var(--white);
+      text-align: left;
+      cursor: pointer;
+      transition: border-color 150ms ease, transform 150ms ease, background 150ms ease;
+    }
+
+    .choice:hover { transform: translateY(-2px); border-color: var(--green); }
+    .choice[aria-pressed="true"] { border: 2px solid var(--green); background: var(--green-soft); }
+    .choice-name { display: block; margin-bottom: 4px; font-weight: 700; }
+    .choice-detail { display: block; color: var(--muted); font-size: 11px; }
+
+    .decision-feedback {
+      display: grid;
+      grid-template-columns: 105px 1fr;
+      gap: 12px;
+      min-height: 54px;
+      align-items: start;
+      margin-top: 10px;
+      padding: 12px 14px;
+      border-left: 3px solid var(--yellow);
+      background: rgba(255, 254, 250, 0.72);
+    }
+
+    .decision-feedback strong { color: var(--green); font: 500 10px var(--mono); text-transform: uppercase; }
+    .decision-feedback p { margin: 0; color: #435249; font-size: 12px; }
+
+    .lab-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(310px, 0.85fr); gap: 17px; align-items: stretch; }
+    .lab-pane { min-width: 0; border: 1px solid var(--line); border-radius: 5px; background: var(--white); }
+    .pane-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 43px; padding: 0 13px; border-bottom: 1px solid var(--line); }
+    .pane-head h3 { margin: 0; font: 500 10px var(--mono); text-transform: uppercase; }
+    .pane-tag { color: var(--muted); font: 400 9px var(--mono); text-transform: uppercase; }
+
+    .lab-controls { display: flex; align-items: end; flex-wrap: wrap; gap: 12px 20px; padding: 12px 14px; }
+    .field { display: grid; gap: 5px; }
+    .field label, .toggle-label { color: var(--muted); font-size: 11px; }
+    select {
+      min-width: 170px;
+      min-height: 36px;
+      padding: 6px 28px 6px 9px;
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      color: var(--ink);
+      background: var(--white);
+    }
+
+    .toggle-wrap { display: flex; align-items: center; gap: 8px; min-height: 36px; }
+    input[type="checkbox"] { width: 17px; height: 17px; accent-color: var(--green); }
+    .run-button, .download-button {
+      min-height: 37px;
+      padding: 0 14px;
+      border: 1px solid var(--green);
+      border-radius: 3px;
+      color: white;
+      background: var(--green);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .run-button:hover, .download-button:hover { background: #194a34; }
+    .map-wrap { position: relative; height: 250px; overflow: hidden; background: #19382e; }
+    #routeCanvas { display: block; width: 100%; height: 100%; }
+    .map-label { position: absolute; top: 10px; left: 12px; color: #e4eee3; font: 400 9px var(--mono); letter-spacing: 0; text-transform: uppercase; }
+    .map-footnote { padding: 8px 13px; color: var(--muted); font-size: 10px; }
+
+    .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--line); }
+    .stat { padding: 10px 12px; border-right: 1px solid var(--line); }
+    .stat:last-child { border-right: 0; }
+    .stat-value { display: block; color: var(--green); font: 500 19px var(--mono); }
+    .stat-name { display: block; margin-top: 2px; color: var(--muted); font-size: 9px; line-height: 1.3; }
+
+    .code-body { padding: 12px 13px 11px; }
+    .code-intro { margin: 0 0 9px; color: var(--muted); font-size: 11px; }
+    pre {
+      min-height: 206px;
+      overflow: auto;
+      margin: 0;
+      padding: 13px;
+      border-radius: 3px;
+      color: #e5eee4;
+      background: #21332b;
+      font: 10px/1.7 var(--mono);
+      tab-size: 2;
+      white-space: pre;
+    }
+
+    .code-explain { margin: 10px 0 0; padding-left: 10px; border-left: 2px solid var(--orange); color: #435249; font-size: 11px; }
+    .simulation-result { min-height: 40px; margin: 0; padding: 10px 13px; border-top: 1px solid var(--line); color: var(--green); font-size: 11px; }
+
+    .lens-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 32px; }
+    .lens { padding: 13px 0 4px; border-top: 2px solid var(--green); }
+    .lens.ethics { border-color: var(--orange); }
+    .lens h3 { margin-bottom: 6px; font: 500 19px var(--serif); }
+    .lens p { margin-bottom: 8px; color: #435249; font-size: 12px; }
+    .lens .jurisdiction { color: var(--muted); font: 400 9px var(--mono); text-transform: uppercase; }
+    .case-note { display: grid; grid-template-columns: 160px 1fr; gap: 18px; margin-top: 19px; padding: 15px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .case-label { color: var(--orange); font: 500 10px var(--mono); text-transform: uppercase; }
+    .case-note p { max-width: 800px; margin: 0; color: #435249; font-size: 12px; }
+
+    .safety-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin: 0; padding: 0; list-style: none; counter-reset: safety; }
+    .safety-list li { position: relative; padding: 4px 0 4px 34px; color: #435249; font-size: 12px; counter-increment: safety; }
+    .safety-list li::before { position: absolute; top: 1px; left: 0; color: var(--orange); content: "0" counter(safety); font: 500 12px var(--mono); }
+
+    .quiz { display: grid; grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr); gap: 24px; align-items: start; }
+    .quiz-question { margin: 0; font-size: 15px; font-weight: 600; }
+    .answers { display: grid; gap: 6px; }
+    .answer {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      color: var(--ink);
+      background: var(--white);
+      text-align: left;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .answer:hover { border-color: var(--green); }
+    .answer.correct { border-color: var(--green); background: var(--green-soft); }
+    .answer.incorrect { border-color: var(--orange); background: var(--orange-soft); }
+    .quiz-feedback { min-height: 38px; margin: 7px 0 0; color: var(--muted); font-size: 11px; }
+
+    .sources { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; padding-top: 4px; }
+    .source { padding-top: 10px; border-top: 1px solid var(--line); }
+    .source-label { display: block; margin-bottom: 6px; color: var(--green); font: 500 9px var(--mono); text-transform: uppercase; }
+    .source a { font-size: 12px; font-weight: 600; }
+    .source p { margin: 5px 0 0; color: var(--muted); font-size: 10px; }
+
+    .reflection-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 20px; }
+    .reflection-field { display: grid; gap: 5px; }
+    .reflection-field label { color: var(--ink); font-size: 11px; font-weight: 600; }
+    .reflection-field small { color: var(--muted); font-size: 10px; }
+    textarea, input[type="text"] {
+      width: 100%;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      color: var(--ink);
+      background: var(--white);
+      font-size: 12px;
+    }
+
+    textarea { min-height: 76px; resize: vertical; }
+    .reflection-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 13px; }
+    .privacy-note { margin: 0; color: var(--muted); font-size: 10px; }
+    .saved-status { min-height: 20px; margin: 8px 0 0; color: var(--green); font-size: 11px; }
+
+    .page-footer { display: flex; justify-content: space-between; gap: 20px; padding: 17px 0 24px; border-top: 1px solid var(--line); color: var(--muted); font-size: 10px; }
+    .page-footer a { text-decoration: none; }
+
+    @media (max-width: 780px) {
+      .shell { width: min(100% - 32px, 620px); }
+      .intro { grid-template-columns: 1fr; gap: 14px; padding-top: 27px; }
+      h1 { font-size: 38px; }
+      .standard-note { max-width: 560px; }
+      .lab-grid { grid-template-columns: 1fr; }
+      .quiz { grid-template-columns: 1fr; gap: 12px; }
+    }
+
+    @media (max-width: 560px) {
+      .shell { width: calc(100% - 26px); }
+      .masthead { min-height: 55px; }
+      .top-links { gap: 12px; }
+      .top-links a { font-size: 10px; }
+      h1 { font-size: 32px; }
+      .dek { font-size: 13px; }
+      .section { padding-top: 17px; }
+      .section-head { align-items: flex-start; flex-direction: column; gap: 5px; }
+      .section-head h2 { font-size: 22px; }
+      .choice-row { grid-template-columns: 1fr; }
+      .choice { min-height: 72px; }
+      .decision-feedback { grid-template-columns: 1fr; gap: 4px; }
+      .lab-controls { align-items: stretch; flex-direction: column; gap: 10px; }
+      .field select, .run-button { width: 100%; }
+      .toggle-wrap { justify-content: flex-start; }
+      .map-wrap { height: 225px; }
+      .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .stat { padding: 8px; }
+      .stat-value { font-size: 16px; }
+      .stat-name { font-size: 8px; }
+      .lens-grid, .sources, .safety-list, .reflection-grid { grid-template-columns: 1fr; gap: 14px; }
+      .case-note { grid-template-columns: 1fr; gap: 6px; }
+      .page-footer { flex-direction: column; gap: 6px; }
+      pre { min-height: 190px; font-size: 9px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="masthead">
+      <a class="brand" href="./" aria-label="Return to MM3000913 portfolio">
+        <span class="brand-mark" aria-hidden="true">5.3</span>
+        <span>Field Notes / Computing</span>
+      </a>
+      <nav class="top-links" aria-label="Page navigation">
+        <a href="#sources">Sources</a>
+        <a href="./">Portfolio &#8599;</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="intro" aria-labelledby="pageTitle">
+        <div>
+          <p class="kicker">Safety, Law &amp; Ethics / Performance Standard 5.3</p>
+          <h1 id="pageTitle">Every ping leaves a pattern.</h1>
+          <p class="dek">A location trail can reveal more than directions. Make a decision, inspect a fictional data trail, and distinguish a legal rule from an ethical responsibility.</p>
+        </div>
+        <aside class="standard-note">
+          <strong>Focus question</strong>
+          When does a useful location feature become an unnecessary privacy risk, and who should decide what happens to the data?
+        </aside>
+      </section>
+
+      <section class="section" aria-labelledby="scenarioTitle">
+        <div class="section-head">
+          <div>
+            <p class="section-index">01 / Make the call</p>
+            <h2 id="scenarioTitle">The campus map asks for access.</h2>
+          </div>
+          <p>There is a trade-off, not a magic setting. Choose a policy and notice what it protects and what it gives up.</p>
+        </div>
+        <p class="scenario-copy">A walking-navigation app needs your location for directions. Its prompt also requests precise access “Always” and says location signals may be shared with analytics partners.</p>
+        <div class="choice-row" role="group" aria-label="Choose a location permission policy">
+          <button class="choice" type="button" data-choice="always" aria-pressed="false">
+            <span class="choice-name">Allow all the time</span>
+            <span class="choice-detail">The app can read location while open or in the background.</span>
+          </button>
+          <button class="choice" type="button" data-choice="while-using" aria-pressed="false">
+            <span class="choice-name">Allow while using</span>
+            <span class="choice-detail">The app can read location while you actively use the map.</span>
+          </button>
+          <button class="choice" type="button" data-choice="never" aria-pressed="false">
+            <span class="choice-name">Do not allow</span>
+            <span class="choice-detail">No location access; live turn-by-turn directions may not work.</span>
+          </button>
+        </div>
+        <div class="decision-feedback" aria-live="polite">
+          <strong id="decisionLabel">Your decision</strong>
+          <p id="decisionFeedback">Choose a permission policy to see its trade-off. You can revise your choice after tracing the sample data.</p>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="labTitle">
+        <div class="section-head">
+          <div>
+            <p class="section-index">02 / Trace the data</p>
+            <h2 id="labTitle">Run a fictional trip through the code.</h2>
+          </div>
+          <p>Change a permission or partner setting, then simulate. No GPS is accessed; the six sample stops below are invented.</p>
+        </div>
+
+        <div class="lab-grid">
+          <section class="lab-pane" aria-labelledby="traceTitle">
+            <div class="pane-head">
+              <h3 id="traceTitle">Sample location trace</h3>
+              <span class="pane-tag">Synthetic data / not to scale</span>
+            </div>
+            <div class="lab-controls">
+              <div class="field">
+                <label for="permissionSelect">Location permission</label>
+                <select id="permissionSelect">
+                  <option value="never">Never</option>
+                  <option value="while-using" selected>While app is in use</option>
+                  <option value="always">Always, including background</option>
+                </select>
+              </div>
+              <label class="toggle-wrap" for="partnerOptIn">
+                <input id="partnerOptIn" type="checkbox">
+                <span class="toggle-label">Include partner sharing in this design</span>
+              </label>
+              <button class="run-button" id="runSimulation" type="button">Run 6-stop simulation</button>
+            </div>
+            <div class="map-wrap">
+              <canvas id="routeCanvas" role="img" aria-label="Fictional route map; highlighted stops show what the selected app permission can record"></canvas>
+              <span class="map-label">Invented route / highlighted = recorded</span>
+            </div>
+            <div class="stats" aria-live="polite">
+              <div class="stat"><span class="stat-value" id="recordedCount">0</span><span class="stat-name">sample stops recorded</span></div>
+              <div class="stat"><span class="stat-value" id="sharedCount">0</span><span class="stat-name">shared with partner</span></div>
+              <div class="stat"><span class="stat-value" id="sensitiveCount">0</span><span class="stat-name">sensitive-place visits</span></div>
+            </div>
+            <p class="simulation-result" id="simulationResult" aria-live="polite">Run the simulation to inspect the sample data flow.</p>
+          </section>
+
+          <section class="lab-pane" aria-labelledby="codeTitle">
+            <div class="pane-head">
+              <h3 id="codeTitle">The permission check</h3>
+              <span class="pane-tag">Local simulation</span>
+            </div>
+            <div class="code-body">
+              <p class="code-intro">The controls change these values. The loop decides which invented stops are recorded and whether they reach a partner.</p>
+              <pre><code id="codeSample"></code></pre>
+              <p class="code-explain" id="codeExplanation">With “while using,” only stops marked as app-open can be read. Change a control and run the simulation to see the effect.</p>
+            </div>
+            <p class="simulation-result" id="codeRunResult" aria-live="polite">This demo runs only in your browser and sends nothing.</p>
+          </section>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="lensesTitle">
+        <div class="section-head">
+          <div>
+            <p class="section-index">03 / Use two lenses</p>
+            <h2 id="lensesTitle">Law sets a floor. Ethics asks what is fair.</h2>
+          </div>
+          <p>These ideas overlap, but they are not interchangeable. An ethical concern is not automatically proof of a legal violation.</p>
+        </div>
+        <div class="lens-grid">
+          <article class="lens">
+            <p class="jurisdiction">United States / Federal law</p>
+            <h3>What does the law prohibit?</h3>
+            <p>Section 5 of the Federal Trade Commission Act, 15 U.S.C. &sect; 45, prohibits unfair or deceptive acts or practices in or affecting commerce. It can apply when a business misleads people about data practices or handles data in an unfair way. It does <strong>not</strong> make every use of GPS illegal; applying it depends on facts and the business involved.</p>
+          </article>
+          <article class="lens ethics">
+            <p class="jurisdiction">Ethics / Professional responsibility</p>
+            <h3>What should a responsible designer do?</h3>
+            <p>Ask whether precise background collection is necessary, whether people can understand and refuse partner sharing, and how long the data is kept. Data minimization and clear choices are ethical safeguards even when no specific law has been shown to be violated.</p>
+          </article>
+        </div>
+
+        <aside class="case-note">
+          <div class="case-label">Real enforcement / FTC, 2024</div>
+          <p>The FTC said X-Mode Social and successor Outlogic sold precise location data associated with mobile advertising IDs; the data could reveal visits to sensitive places. The FTC finalized a consent order in April 2024 prohibiting the companies from sharing or selling sensitive location data. That company-specific order is an example of enforcement, not a blanket ban on navigation apps or GPS.</p>
+        </aside>
+      </section>
+
+      <section class="section" aria-labelledby="safetyTitle">
+        <div class="section-head">
+          <div>
+            <p class="section-index">04 / Make it safer</p>
+            <h2 id="safetyTitle">A practical privacy check.</h2>
+          </div>
+          <p>Before granting access, compare what a feature needs with what the app is asking for.</p>
+        </div>
+        <ol class="safety-list">
+          <li><strong>Limit the permission.</strong> Prefer access only while using the app when background tracking is not needed.</li>
+          <li><strong>Check the recipient.</strong> Look for whether precise location is shared with analytics or advertising partners.</li>
+          <li><strong>Revisit the choice.</strong> Review permissions and delete apps or access you no longer need.</li>
+        </ol>
+      </section>
+
+      <section class="section" aria-labelledby="quizTitle">
+        <div class="section-head">
+          <div>
+            <p class="section-index">05 / Check your reasoning</p>
+            <h2 id="quizTitle">Which concern matters most?</h2>
+          </div>
+          <p>Choose the strongest privacy concern in the navigation-app scenario.</p>
+        </div>
+        <div class="quiz">
+          <p class="quiz-question">A precise location history is collected and shared with a data partner. What could go wrong?</p>
+          <div>
+            <div class="answers" role="group" aria-label="Answer choices">
+              <button class="answer" type="button" data-correct="false">GPS automatically captures the words spoken near the phone.</button>
+              <button class="answer" type="button" data-correct="true">A trail linked to a device may reveal routines or visits to sensitive places.</button>
+              <button class="answer" type="button" data-correct="false">Any single GPS reading automatically violates U.S. federal law.</button>
+              <button class="answer" type="button" data-correct="false">Location data can only be used by the navigation app that collected it.</button>
+            </div>
+            <p class="quiz-feedback" id="quizFeedback" aria-live="polite">Select an answer to see why it is strong or weak.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="sources" aria-labelledby="sourcesTitle">
+        <div class="section-head">
+          <div>
+            <p class="section-index">Sources / Read beyond this lesson</p>
+            <h2 id="sourcesTitle">Primary and consumer guidance.</h2>
+          </div>
+          <p>Law and case details are U.S.-specific. Links below are to government sources.</p>
+        </div>
+        <div class="sources">
+          <article class="source">
+            <span class="source-label">Official statute / U.S. federal</span>
+            <a href="https://www.govinfo.gov/content/pkg/USCODE-2023-title15/pdf/USCODE-2023-title15-chap2-subchapI-sec45.pdf" target="_blank" rel="noopener">15 U.S.C. &sect; 45, FTC Act Section 5</a>
+            <p>United States Code, 2023 edition, U.S. Government Publishing Office. See subsection (a).</p>
+          </article>
+          <article class="source">
+            <span class="source-label">Official enforcement record / FTC</span>
+            <a href="https://www.ftc.gov/legal-library/browse/cases-proceedings/2123038-x-mode-social-inc" target="_blank" rel="noopener">X-Mode Social and Outlogic case timeline</a>
+            <p>Federal Trade Commission; includes the April 2024 final order and decision.</p>
+          </article>
+          <article class="source">
+            <span class="source-label">Consumer guidance / FTC</span>
+            <a href="https://consumer.ftc.gov/articles/how-websites-and-apps-collect-and-use-your-information" target="_blank" rel="noopener">How websites and apps collect and use your information</a>
+            <p>Federal Trade Commission; tracking, app permissions, and privacy settings.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="reflectionTitle">
+        <div class="section-head">
+          <div>
+            <p class="section-index">06 / Explain and revise</p>
+            <h2 id="reflectionTitle">Make your thinking visible.</h2>
+          </div>
+          <p>Complete this with your own reasoning. Test the site with a classmate before filling in the last two fields.</p>
+        </div>
+        <form id="reflectionForm">
+          <div class="reflection-grid">
+            <div class="reflection-field">
+              <label for="takeaway">Explain one privacy risk and how it differs from a legal rule.</label>
+              <textarea id="takeaway" required placeholder="Use the location scenario in your explanation."></textarea>
+            </div>
+            <div class="reflection-field">
+              <label for="codeChange">Describe one code interaction you tried.</label>
+              <textarea id="codeChange" required placeholder="Name the control you changed and how the simulated data changed."></textarea>
+            </div>
+            <div class="reflection-field">
+              <label for="peerFeedback">Classmate test: what did your classmate find confusing or difficult?</label>
+              <textarea id="peerFeedback" required placeholder="Record actual feedback; do not guess or invent it."></textarea>
+            </div>
+            <div class="reflection-field">
+              <label for="revision">What specific improvement did you make because of that feedback?</label>
+              <textarea id="revision" required placeholder="If you have not tested it yet, do that before completing this field."></textarea>
+            </div>
+          </div>
+          <div class="reflection-actions">
+            <button class="download-button" type="submit">Download reflection and test record</button>
+            <p class="privacy-note">Your answers are not uploaded or saved by this page. The button downloads a text file on this device.</p>
+          </div>
+          <p class="saved-status" id="formStatus" aria-live="polite"></p>
+        </form>
+      </section>
+    </main>
+
+    <footer class="page-footer">
+      <span>Safety, Law &amp; Ethics Lab / Standard 5.3</span>
+      <a href="./">Return to portfolio</a>
+    </footer>
+  </div>
+
+  <script>
+    (() => {
+      const sampleStops = [
+        { place: "Home", appOpen: false, sensitive: false, x: 0.09, y: 0.68 },
+        { place: "School", appOpen: true, sensitive: false, x: 0.27, y: 0.34 },
+        { place: "Library", appOpen: true, sensitive: false, x: 0.47, y: 0.60 },
+        { place: "Clinic", appOpen: false, sensitive: true, x: 0.68, y: 0.27 },
+        { place: "Home", appOpen: false, sensitive: false, x: 0.83, y: 0.71 },
+        { place: "School", appOpen: true, sensitive: false, x: 0.94, y: 0.43 }
+      ];
+
+      const permissionSelect = document.getElementById("permissionSelect");
+      const partnerOptIn = document.getElementById("partnerOptIn");
+      const routeCanvas = document.getElementById("routeCanvas");
+      const decisionFeedback = document.getElementById("decisionFeedback");
+      const decisionLabel = document.getElementById("decisionLabel");
+      const codeSample = document.getElementById("codeSample");
+      let recordedStops = [];
+
+      const policyFeedback = {
+        always: {
+          label: "Trade-off",
+          text: "Background access can support a feature that truly needs it, but it exposes more of a movement history than a walking map usually needs. Check retention and recipients, not just the permission prompt."
+        },
+        "while-using": {
+          label: "Trade-off",
+          text: "This is a narrower default for active directions: the sample records only stops made while the map is open. Precise routes can still be sensitive, so check who receives them and how long they are kept."
+        },
+        never: {
+          label: "Trade-off",
+          text: "This prevents the app from reading location in this design, but live turn-by-turn directions may not work. A typed destination or route preview can preserve some usefulness with less access."
+        }
+      };
+
+      function currentPolicy() {
+        return permissionSelect.value;
+      }
+
+      function canReadStop(stop) {
+        const permission = currentPolicy();
+        return permission === "always" || (permission === "while-using" && stop.appOpen);
+      }
+
+      function updateCode() {
+        const permission = currentPolicy();
+        const sharing = partnerOptIn.checked;
+        codeSample.textContent = [
+          `const permission = "${permission}";`,
+          `const partnerOptIn = ${sharing};`,
+          "",
+          "for (const stop of sampleStops) {",
+          "  const appMayRead =",
+          '    permission === "always" ||',
+          '    (permission === "while-using" && stop.appOpen);',
+          "",
+          "  if (appMayRead) {",
+          "    deviceLog.push(stop.place);",
+          "    if (partnerOptIn) partnerLog.push(stop.place);",
+          "  }",
+          "}"
+        ].join("\n");
+
+        const policyExplanation = permission === "always"
+          ? "“Always” lets the app read all six invented stops, including background visits."
+          : permission === "never"
+            ? "“Never” makes appMayRead false for every stop, so the app records none."
+            : "“While using” records only stops marked appOpen; background stops stay out of the log.";
+        const sharingExplanation = sharing
+          ? " With partnerOptIn on, every recorded stop is also copied to the simulated partner log."
+          : " With partnerOptIn off, recorded stops stay in the simulated device log.";
+        document.getElementById("codeExplanation").textContent = policyExplanation + sharingExplanation;
+      }
+
+      function runSimulation() {
+        recordedStops = sampleStops.filter(canReadStop);
+        const sharedStops = partnerOptIn.checked ? recordedStops : [];
+        const sensitiveVisits = recordedStops.filter((stop) => stop.sensitive);
+        document.getElementById("recordedCount").textContent = recordedStops.length;
+        document.getElementById("sharedCount").textContent = sharedStops.length;
+        document.getElementById("sensitiveCount").textContent = sensitiveVisits.length;
+        document.getElementById("simulationResult").textContent = recordedStops.length === 0
+          ? "No sample locations were recorded. In a real app, live location-based directions would be unavailable."
+          : `${recordedStops.length} of 6 sample stops entered the device log${sensitiveVisits.length ? ", including a visit to a clinic" : ""}${sharedStops.length ? `; all ${sharedStops.length} recorded stops were also sent to the simulated partner` : "; none were sent to a partner"}.`;
+        document.getElementById("codeRunResult").textContent = `Simulation result: device log ${recordedStops.length} / 6; partner log ${sharedStops.length} / 6. This is fictional data and no network request was made.`;
+        updateCode();
+        drawRoute();
+      }
+
+      function setChoice(permission) {
+        permissionSelect.value = permission;
+        document.querySelectorAll("[data-choice]").forEach((button) => {
+          button.setAttribute("aria-pressed", String(button.dataset.choice === permission));
+        });
+        const feedback = policyFeedback[permission];
+        decisionLabel.textContent = feedback.label;
+        decisionFeedback.textContent = feedback.text;
+        runSimulation();
+      }
+
+      function drawRoute() {
+        const bounds = routeCanvas.getBoundingClientRect();
+        if (!bounds.width || !bounds.height) return;
+        const ratio = window.devicePixelRatio || 1;
+        routeCanvas.width = Math.round(bounds.width * ratio);
+        routeCanvas.height = Math.round(bounds.height * ratio);
+        const context = routeCanvas.getContext("2d");
+        context.setTransform(ratio, 0, 0, ratio, 0, 0);
+        context.clearRect(0, 0, bounds.width, bounds.height);
+
+        context.strokeStyle = "rgba(193, 214, 188, 0.12)";
+        context.lineWidth = 1;
+        for (let x = -bounds.height; x < bounds.width + bounds.height; x += 48) {
+          context.beginPath();
+          context.moveTo(x, 0);
+          context.lineTo(x + bounds.height * 0.7, bounds.height);
+          context.stroke();
+        }
+        for (let y = 35; y < bounds.height; y += 42) {
+          context.beginPath();
+          context.moveTo(0, y);
+          context.bezierCurveTo(bounds.width * 0.3, y - 10, bounds.width * 0.65, y + 14, bounds.width, y - 6);
+          context.stroke();
+        }
+
+        const points = sampleStops.map((stop) => ({
+          ...stop,
+          px: 20 + stop.x * (bounds.width - 40),
+          py: 28 + stop.y * (bounds.height - 50)
+        }));
+
+        context.beginPath();
+        points.forEach((point, index) => {
+          if (index === 0) context.moveTo(point.px, point.py);
+          else context.lineTo(point.px, point.py);
+        });
+        context.strokeStyle = "#d8c46b";
+        context.lineWidth = 2;
+        context.setLineDash([4, 5]);
+        context.stroke();
+        context.setLineDash([]);
+
+        points.forEach((point, index) => {
+          const recorded = recordedStops.some((stop) => stop.place === point.place && sampleStops.indexOf(stop) === index);
+          context.beginPath();
+          context.arc(point.px, point.py, recorded ? 7 : 5, 0, Math.PI * 2);
+          context.fillStyle = recorded ? (point.sensitive ? "#ed9870" : "#d8c46b") : "#668477";
+          context.fill();
+          context.lineWidth = recorded ? 2 : 1;
+          context.strokeStyle = recorded ? "#fff6d8" : "#a5b9a7";
+          context.stroke();
+
+          const label = point.place;
+          const labelX = point.px + (point.x > 0.78 ? -7 : 8);
+          context.font = "10px 'DM Mono', Consolas, monospace";
+          context.textAlign = point.x > 0.78 ? "right" : "left";
+          context.textBaseline = "middle";
+          context.fillStyle = recorded ? "#fff7dd" : "#b3c5b6";
+          context.fillText(label, labelX, point.py + (index % 2 === 0 ? 13 : -12));
+        });
+      }
+
+      document.querySelectorAll("[data-choice]").forEach((button) => {
+        button.addEventListener("click", () => setChoice(button.dataset.choice));
+      });
+      permissionSelect.addEventListener("change", () => {
+        document.querySelectorAll("[data-choice]").forEach((button) => button.setAttribute("aria-pressed", "false"));
+        decisionLabel.textContent = "Revised policy";
+        decisionFeedback.textContent = "You changed the setting in the lab. Compare the new trace with your earlier choice and decide which data is actually needed for the feature.";
+        runSimulation();
+      });
+      partnerOptIn.addEventListener("change", runSimulation);
+      document.getElementById("runSimulation").addEventListener("click", runSimulation);
+
+      document.querySelectorAll(".answer").forEach((button) => {
+        button.addEventListener("click", () => {
+          document.querySelectorAll(".answer").forEach((answer) => answer.classList.remove("correct", "incorrect"));
+          const correct = button.dataset.correct === "true";
+          button.classList.add(correct ? "correct" : "incorrect");
+          document.getElementById("quizFeedback").textContent = correct
+            ? "Right. Repeated precise points can expose routines or visits to sensitive places, especially if a device identifier links them to a person or a recipient reuses them."
+            : "Not quite. The key risk is what a precise trail can reveal and who can connect or reuse it. GPS does not automatically record conversations, and collection is not automatically illegal.";
+        });
+      });
+
+      document.getElementById("reflectionForm").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const sections = [
+          ["Safety, Law & Ethics Lab / Standard 5.3", ""],
+          ["Learning explanation", document.getElementById("takeaway").value.trim()],
+          ["Code interaction", document.getElementById("codeChange").value.trim()],
+          ["Classmate feedback", document.getElementById("peerFeedback").value.trim()],
+          ["Revision made", document.getElementById("revision").value.trim()]
+        ];
+        const report = sections.map(([heading, answer]) => answer ? `${heading}\n${answer}` : heading).join("\n\n");
+        const blob = new Blob([report], { type: "text/plain;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "safety-law-ethics-reflection.txt";
+        link.click();
+        URL.revokeObjectURL(url);
+        document.getElementById("formStatus").textContent = "Reflection downloaded. Review it before submitting; the peer-test fields should describe an actual test.";
+      });
+
+      new ResizeObserver(drawRoute).observe(routeCanvas.parentElement);
+      updateCode();
+      runSimulation();
+    })();
+  </script>
+</body>
+</html>
