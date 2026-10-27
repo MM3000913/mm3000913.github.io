@@ -1,0 +1,755 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f3f3ed">
+  <title>Recursion Visualizer | MM3000913</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f3f3ed;
+      --surface: #fffefa;
+      --ink: #202820;
+      --muted: #687168;
+      --line: #d9ddd3;
+      --green: #245c43;
+      --green-soft: #dceadf;
+      --blue: #547a9c;
+      --blue-soft: #e1eaf1;
+      --amber: #c78232;
+      --amber-soft: #f4e7ce;
+      --coral: #c45c45;
+      --mono: "DM Mono", Consolas, monospace;
+      --sans: "DM Sans", "Segoe UI", sans-serif;
+      --serif: "Fraunces", Georgia, serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background-color: var(--paper);
+      background-image: radial-gradient(#cbd0c5 0.65px, transparent 0.65px);
+      background-size: 18px 18px;
+      font-family: var(--sans);
+      font-size: 14px;
+    }
+
+    button, select, input { font: inherit; }
+
+    button:focus-visible, select:focus-visible, input:focus-visible, a:focus-visible {
+      outline: 3px solid #d18b51;
+      outline-offset: 3px;
+    }
+
+    .page-shell { max-width: 1500px; margin: 0 auto; padding: 0 34px 32px; }
+
+    .topbar {
+      min-height: 66px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .wordmark {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--green);
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 500;
+      text-decoration: none;
+    }
+
+    .mark {
+      width: 22px;
+      height: 22px;
+      display: grid;
+      place-items: center;
+      border: 1.5px solid var(--green);
+      border-radius: 50%;
+      font-family: var(--serif);
+      font-size: 16px;
+    }
+
+    .back-link { color: var(--muted); text-decoration: none; }
+    .back-link:hover { color: var(--green); }
+
+    .intro {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 27px 0 22px;
+    }
+
+    .eyebrow {
+      margin: 0 0 5px;
+      color: var(--green);
+      font-family: var(--mono);
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-family: var(--serif);
+      font-size: 34px;
+      font-weight: 500;
+      line-height: 1.15;
+    }
+
+    .result-block { min-width: 140px; text-align: right; }
+    .result-label { color: var(--muted); font-size: 12px; }
+    .result-value { color: var(--green); font-family: var(--mono); font-size: 25px; }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px 22px;
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: rgba(255, 254, 250, 0.88);
+    }
+
+    .control-group { display: flex; align-items: center; gap: 10px; }
+    .control-label { color: var(--muted); font-size: 12px; }
+
+    select {
+      min-width: 168px;
+      padding: 8px 30px 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      color: var(--ink);
+      background: var(--surface);
+    }
+
+    .range-wrap { display: flex; align-items: center; gap: 10px; }
+    input[type="range"] { width: 150px; accent-color: var(--green); }
+    .n-value { min-width: 22px; color: var(--green); font-family: var(--mono); font-weight: 500; }
+
+    .transport { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+
+    .transport button {
+      min-height: 36px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      color: var(--ink);
+      background: var(--surface);
+      cursor: pointer;
+    }
+
+    .transport button:hover:not(:disabled) { border-color: var(--green); color: var(--green); }
+    .transport button:disabled { opacity: 0.42; cursor: default; }
+    .transport .play-button { min-width: 84px; border-color: var(--green); color: #fff; background: var(--green); }
+    .transport .play-button:hover:not(:disabled) { color: #fff; background: #194a34; }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1.8fr) minmax(290px, 0.82fr);
+      gap: 14px;
+      margin-top: 14px;
+      align-items: stretch;
+    }
+
+    .panel {
+      min-width: 0;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--surface);
+    }
+
+    .tree-panel { display: flex; min-height: 580px; flex-direction: column; }
+
+    .panel-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 48px;
+      padding: 0 15px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .panel-title {
+      margin: 0;
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+
+    .panel-meta { color: var(--muted); font-family: var(--mono); font-size: 11px; }
+
+    .tree-viewport { flex: 1; min-height: 450px; overflow: auto; }
+    #treeCanvas { display: block; }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      padding: 12px 15px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .legend-item { display: inline-flex; align-items: center; gap: 6px; }
+    .legend-dot { width: 9px; height: 9px; border-radius: 50%; }
+    .dot-call { background: var(--blue); }
+    .dot-base { background: var(--amber); }
+    .dot-return { background: var(--green); }
+    .dot-active { border: 2px solid var(--coral); background: transparent; }
+
+    .side-column { display: grid; grid-template-rows: minmax(280px, 1fr) 230px; gap: 14px; min-height: 580px; }
+    .stack-panel { display: flex; min-height: 0; flex-direction: column; }
+    .stack-list { min-height: 0; overflow: auto; padding: 10px; }
+
+    .stack-empty {
+      display: grid;
+      min-height: 120px;
+      place-items: center;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+
+    .stack-frame {
+      margin-bottom: 7px;
+      padding: 10px 11px;
+      border: 1px solid var(--line);
+      border-left: 3px solid #c8cec5;
+      border-radius: 4px;
+      background: #fff;
+      animation: frame-in 180ms ease-out both;
+    }
+
+    .stack-frame.active { border-left-color: var(--blue); background: var(--blue-soft); }
+    .stack-frame.returning { border-left-color: var(--green); background: var(--green-soft); }
+    .frame-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .frame-name { font-family: var(--mono); font-size: 12px; font-weight: 500; }
+    .frame-tag { color: var(--blue); font-family: var(--mono); font-size: 9px; text-transform: uppercase; }
+    .frame-detail { margin-top: 5px; color: var(--muted); font-size: 11px; overflow-wrap: anywhere; }
+
+    .spiral-panel { display: flex; min-height: 0; flex-direction: column; }
+    .spiral-content { position: relative; flex: 1; min-height: 175px; }
+    #spiralCanvas { display: block; width: 100%; height: 100%; }
+    .spiral-caption { position: absolute; right: 12px; bottom: 8px; color: #c8d1c5; font-family: var(--mono); font-size: 10px; }
+
+    .step-footer {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 44px;
+      margin-top: 12px;
+      padding: 0 2px;
+    }
+
+    .step-count { flex: 0 0 auto; color: var(--green); font-family: var(--mono); font-size: 11px; }
+    .step-track { height: 3px; flex: 1; overflow: hidden; border-radius: 3px; background: #d9ddd3; }
+    .step-progress { width: 0; height: 100%; background: var(--coral); transition: width 180ms ease; }
+    .step-description { min-width: 0; overflow: hidden; color: var(--muted); text-align: right; text-overflow: ellipsis; white-space: nowrap; }
+
+    @keyframes frame-in { from { opacity: 0.5; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+
+    @media (max-width: 900px) {
+      .page-shell { padding-right: 20px; padding-left: 20px; }
+      .workspace { grid-template-columns: minmax(0, 1.35fr) minmax(260px, 0.9fr); }
+      .tree-panel { min-height: 540px; }
+      .side-column { min-height: 540px; grid-template-rows: minmax(260px, 1fr) 215px; }
+      .transport { margin-left: 0; }
+    }
+
+    @media (max-width: 680px) {
+      .page-shell { padding: 0 14px 22px; }
+      .topbar { min-height: 56px; }
+      .intro { align-items: center; padding: 22px 0 16px; }
+      h1 { font-size: 28px; }
+      .result-block { min-width: 95px; }
+      .result-value { font-size: 21px; }
+      .toolbar { gap: 12px; padding: 12px; }
+      .control-group { justify-content: space-between; width: 100%; }
+      select { flex: 1; }
+      input[type="range"] { width: min(52vw, 220px); }
+      .transport { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); width: 100%; }
+      .transport button { padding: 0 7px; }
+      .workspace { grid-template-columns: minmax(0, 1fr); }
+      .tree-panel { min-height: 440px; }
+      .tree-viewport { min-height: 345px; }
+      .side-column { grid-template-rows: minmax(250px, 310px) 220px; min-height: 0; }
+      .step-footer { align-items: flex-start; flex-wrap: wrap; padding-top: 7px; }
+      .step-track { order: 3; flex-basis: 100%; }
+      .step-description { flex: 1; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <header class="topbar">
+      <a class="wordmark" href="./" aria-label="Return to portfolio">
+        <span class="mark" aria-hidden="true">R</span>
+        <span>RECURSION STUDIO</span>
+      </a>
+      <a class="back-link" href="./">Portfolio <span aria-hidden="true">&#8599;</span></a>
+    </header>
+
+    <main>
+      <section class="intro" aria-labelledby="page-title">
+        <div>
+          <p class="eyebrow">Interactive computer science</p>
+          <h1 id="page-title">Recursion Visualizer</h1>
+        </div>
+        <div class="result-block" aria-live="polite">
+          <div class="result-label">Final result</div>
+          <div class="result-value" id="resultValue">5</div>
+        </div>
+      </section>
+
+      <section class="toolbar" aria-label="Visualizer controls">
+        <label class="control-group" for="algorithmSelect">
+          <span class="control-label">Algorithm</span>
+          <select id="algorithmSelect">
+            <option value="fibonacci">Fibonacci</option>
+            <option value="factorial">Factorial</option>
+            <option value="spiral">Spiral + Factorial</option>
+          </select>
+        </label>
+        <label class="control-group" for="inputSlider">
+          <span class="control-label">Input</span>
+          <span class="range-wrap">
+            <input id="inputSlider" type="range" min="1" max="7" value="5">
+            <span class="n-value" id="inputValue">n = 5</span>
+          </span>
+        </label>
+        <div class="transport" role="group" aria-label="Playback controls">
+          <button id="previousButton" type="button" title="Previous step" aria-label="Previous step">&#8592; Back</button>
+          <button id="playButton" class="play-button" type="button" title="Play animation" aria-label="Play animation">&#9654; Play</button>
+          <button id="nextButton" type="button" title="Next step" aria-label="Next step">Next &#8594;</button>
+          <button id="resetButton" type="button" title="Reset animation">Reset</button>
+        </div>
+      </section>
+
+      <section class="workspace" aria-label="Recursion visualization">
+        <section class="panel tree-panel" aria-labelledby="treeTitle">
+          <div class="panel-heading">
+            <h2 class="panel-title" id="treeTitle">Recursion map</h2>
+            <span class="panel-meta" id="callCount">0 calls</span>
+          </div>
+          <div class="tree-viewport" id="treeViewport" tabindex="0" aria-label="Scrollable recursion call tree">
+            <canvas id="treeCanvas" role="img" aria-label="Recursion call tree diagram"></canvas>
+          </div>
+          <div class="legend" aria-label="Call tree legend">
+            <span class="legend-item"><span class="legend-dot dot-call"></span>Call</span>
+            <span class="legend-item"><span class="legend-dot dot-base"></span>Base case</span>
+            <span class="legend-item"><span class="legend-dot dot-return"></span>Returned</span>
+            <span class="legend-item"><span class="legend-dot dot-active"></span>Active call</span>
+          </div>
+        </section>
+
+        <aside class="side-column">
+          <section class="panel stack-panel" aria-labelledby="stackTitle">
+            <div class="panel-heading">
+              <h2 class="panel-title" id="stackTitle">Live call stack</h2>
+              <span class="panel-meta">TOP FIRST</span>
+            </div>
+            <div class="stack-list" id="stackList" aria-live="polite"></div>
+          </section>
+          <section class="panel spiral-panel" aria-labelledby="spiralTitle">
+            <div class="panel-heading">
+              <h2 class="panel-title" id="spiralTitle">Recursion spiral</h2>
+              <span class="panel-meta" id="spiralState">READY</span>
+            </div>
+            <div class="spiral-content">
+              <canvas id="spiralCanvas" role="img" aria-label="Colorful recursion spiral"></canvas>
+              <span class="spiral-caption" id="spiralCaption">n = 5</span>
+            </div>
+          </section>
+        </aside>
+      </section>
+
+      <footer class="step-footer" aria-live="polite">
+        <span class="step-count" id="stepCount">STEP 1 / 1</span>
+        <div class="step-track" aria-hidden="true"><div class="step-progress" id="stepProgress"></div></div>
+        <span class="step-description" id="stepDescription">Ready</span>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    (() => {
+      const algorithmSelect = document.getElementById("algorithmSelect");
+      const inputSlider = document.getElementById("inputSlider");
+      const inputValue = document.getElementById("inputValue");
+      const resultValue = document.getElementById("resultValue");
+      const previousButton = document.getElementById("previousButton");
+      const playButton = document.getElementById("playButton");
+      const nextButton = document.getElementById("nextButton");
+      const resetButton = document.getElementById("resetButton");
+      const stackList = document.getElementById("stackList");
+      const treeCanvas = document.getElementById("treeCanvas");
+      const treeViewport = document.getElementById("treeViewport");
+      const spiralCanvas = document.getElementById("spiralCanvas");
+      const state = { steps: [], root: null, index: 0, timer: null };
+
+      const copyStack = (stack) => stack.map((frame) => ({ ...frame }));
+
+      function buildExecution() {
+        const n = Number(inputSlider.value);
+        const mode = algorithmSelect.value;
+        const isFactorial = mode !== "fibonacci";
+        const steps = [];
+        const stack = [];
+        let nextId = 0;
+
+        function record(type, label, activeCall) {
+          steps.push({ type, label, activeCall, stack: copyStack(stack) });
+        }
+
+        function factorial(value) {
+          const node = { id: ++nextId, name: `fact(${value})`, n: value, type: "call", result: null, children: [] };
+          const frame = { name: "fact", param: value, status: `Calling fact(${value})`, returnVal: null };
+          stack.unshift(frame);
+          record("CALL", `Call fact(${value})`, node.id);
+
+          if (value <= 1) {
+            frame.status = "Base case reached";
+            frame.returnVal = 1;
+            node.type = "base";
+            node.result = 1;
+            record("BASE_CASE", `Base case: fact(${value}) = 1`, node.id);
+            stack.shift();
+            return node;
+          }
+
+          const child = factorial(value - 1);
+          node.children.push(child);
+          node.result = value * child.result;
+          node.type = "return";
+          const returning = { name: "fact", param: value, status: `${value} x ${child.result} = ${node.result}`, returnVal: node.result };
+          stack.unshift(returning);
+          record("RETURN", `Return fact(${value}) = ${value} x ${child.result} = ${node.result}`, node.id);
+          stack.shift();
+          return node;
+        }
+
+        function fibonacci(value) {
+          const node = { id: ++nextId, name: `fib(${value})`, n: value, type: "call", result: null, children: [] };
+          const frame = { name: "fib", param: value, status: `Calling fib(${value})`, returnVal: null };
+          stack.unshift(frame);
+          record("CALL", `Call fib(${value})`, node.id);
+
+          if (value <= 1) {
+            frame.status = "Base case reached";
+            frame.returnVal = value;
+            node.type = "base";
+            node.result = value;
+            record("BASE_CASE", `Base case: fib(${value}) = ${value}`, node.id);
+            stack.shift();
+            return node;
+          }
+
+          const left = fibonacci(value - 1);
+          const right = fibonacci(value - 2);
+          node.children.push(left, right);
+          node.result = left.result + right.result;
+          node.type = "return";
+          const returning = { name: "fib", param: value, status: `${left.result} + ${right.result} = ${node.result}`, returnVal: node.result };
+          stack.unshift(returning);
+          record("RETURN", `Return fib(${value}) = ${left.result} + ${right.result} = ${node.result}`, node.id);
+          stack.shift();
+          return node;
+        }
+
+        const root = isFactorial ? factorial(n) : fibonacci(n);
+        state.root = root;
+        state.steps = steps;
+        state.index = 0;
+        resultValue.textContent = root.result;
+        document.getElementById("callCount").textContent = `${nextId} ${nextId === 1 ? "call" : "calls"}`;
+        renderStep();
+      }
+
+      function stopPlayback() {
+        if (state.timer !== null) {
+          window.clearInterval(state.timer);
+          state.timer = null;
+        }
+        playButton.innerHTML = "&#9654; Play";
+        playButton.setAttribute("aria-label", "Play animation");
+        playButton.title = "Play animation";
+      }
+
+      function play() {
+        if (state.index >= state.steps.length - 1) {
+          state.index = 0;
+          renderStep();
+        }
+        playButton.innerHTML = "&#10074;&#10074; Pause";
+        playButton.setAttribute("aria-label", "Pause animation");
+        playButton.title = "Pause animation";
+        state.timer = window.setInterval(() => {
+          if (state.index < state.steps.length - 1) {
+            state.index += 1;
+            renderStep();
+          } else {
+            stopPlayback();
+          }
+        }, 650);
+      }
+
+      function changeStep(delta) {
+        const nextIndex = Math.max(0, Math.min(state.steps.length - 1, state.index + delta));
+        if (nextIndex !== state.index) {
+          state.index = nextIndex;
+          renderStep();
+        }
+      }
+
+      function renderStep() {
+        const step = state.steps[state.index];
+        if (!step) return;
+
+        const total = state.steps.length;
+        document.getElementById("stepCount").textContent = `STEP ${state.index + 1} / ${total}`;
+        document.getElementById("stepDescription").textContent = step.label;
+        document.getElementById("stepProgress").style.width = `${total > 1 ? state.index / (total - 1) * 100 : 0}%`;
+        document.getElementById("spiralState").textContent = step.type;
+        document.getElementById("spiralCaption").textContent = `n = ${inputSlider.value}  /  ${step.type}`;
+        previousButton.disabled = state.index === 0;
+        nextButton.disabled = state.index === total - 1;
+
+        stackList.replaceChildren();
+        if (step.stack.length === 0) {
+          const empty = document.createElement("div");
+          empty.className = "stack-empty";
+          empty.textContent = "Stack empty";
+          stackList.append(empty);
+        } else {
+          step.stack.forEach((frame, index) => {
+            const card = document.createElement("article");
+            card.className = `stack-frame${index === 0 ? " active" : frame.returnVal !== null ? " returning" : ""}`;
+
+            const top = document.createElement("div");
+            top.className = "frame-top";
+            const name = document.createElement("span");
+            name.className = "frame-name";
+            name.textContent = `${frame.name}(${frame.param})`;
+            top.append(name);
+            if (index === 0) {
+              const tag = document.createElement("span");
+              tag.className = "frame-tag";
+              tag.textContent = "Active";
+              top.append(tag);
+            }
+            const detail = document.createElement("div");
+            detail.className = "frame-detail";
+            detail.textContent = frame.returnVal !== null ? `Return value: ${frame.returnVal}` : frame.status;
+            card.append(top, detail);
+            stackList.append(card);
+          });
+        }
+
+        drawTree(step.activeCall);
+        drawSpiral();
+      }
+
+      function leafCount(node) {
+        if (node.children.length === 0) return 1;
+        return node.children.reduce((sum, child) => sum + leafCount(child), 0);
+      }
+
+      function treeDepth(node) {
+        if (node.children.length === 0) return 1;
+        return 1 + Math.max(...node.children.map(treeDepth));
+      }
+
+      function drawTree(activeCall) {
+        const leaves = leafCount(state.root);
+        const depth = treeDepth(state.root);
+        const width = Math.max(treeViewport.clientWidth, leaves * 92 + 48);
+        const height = Math.max(treeViewport.clientHeight, depth * 88 + 72);
+        const ratio = window.devicePixelRatio || 1;
+        treeCanvas.width = width * ratio;
+        treeCanvas.height = height * ratio;
+        treeCanvas.style.width = `${width}px`;
+        treeCanvas.style.height = `${height}px`;
+
+        const context = treeCanvas.getContext("2d");
+        context.setTransform(ratio, 0, 0, ratio, 0, 0);
+        context.clearRect(0, 0, width, height);
+
+        for (let x = 14; x < width; x += 24) {
+          for (let y = 14; y < height; y += 24) {
+            context.fillStyle = "#e8ebe4";
+            context.fillRect(x, y, 1.5, 1.5);
+          }
+        }
+
+        const positions = new Map();
+        const leftEdge = 34;
+        const rightEdge = width - 34;
+        const rowGap = Math.min(88, Math.max(68, (height - 56) / depth));
+
+        function position(node, left, right, level) {
+          const y = 32 + level * rowGap;
+          if (node.children.length === 0) {
+            positions.set(node.id, { x: (left + right) / 2, y });
+            return;
+          }
+          const childWeights = node.children.map(leafCount);
+          const totalWeight = childWeights.reduce((sum, weight) => sum + weight, 0);
+          let cursor = left;
+          const childCenters = [];
+          node.children.forEach((child, index) => {
+            const span = (right - left) * childWeights[index] / totalWeight;
+            position(child, cursor, cursor + span, level + 1);
+            childCenters.push(positions.get(child.id).x);
+            cursor += span;
+          });
+          positions.set(node.id, { x: childCenters.reduce((sum, value) => sum + value, 0) / childCenters.length, y });
+        }
+
+        position(state.root, leftEdge, rightEdge, 0);
+
+        function drawBranches(node) {
+          const parent = positions.get(node.id);
+          node.children.forEach((child) => {
+            const childPosition = positions.get(child.id);
+            context.beginPath();
+            context.moveTo(parent.x, parent.y + 22);
+            context.lineTo(childPosition.x, childPosition.y - 22);
+            context.strokeStyle = "#aeb9ad";
+            context.lineWidth = 1.5;
+            context.stroke();
+            drawBranches(child);
+          });
+        }
+
+        drawBranches(state.root);
+
+        function drawNodes(node) {
+          const point = positions.get(node.id);
+          const nodeWidth = 74;
+          const nodeHeight = 48;
+          const colors = node.type === "base"
+            ? { fill: "#f4e7ce", stroke: "#c78232" }
+            : node.type === "return"
+              ? { fill: "#dceadf", stroke: "#6e9b79" }
+              : { fill: "#e1eaf1", stroke: "#7895ad" };
+
+          context.beginPath();
+          context.roundRect(point.x - nodeWidth / 2, point.y - nodeHeight / 2, nodeWidth, nodeHeight, 7);
+          context.fillStyle = colors.fill;
+          context.fill();
+          context.lineWidth = node.id === activeCall ? 2.5 : 1;
+          context.strokeStyle = node.id === activeCall ? "#c45c45" : colors.stroke;
+          context.stroke();
+          context.textAlign = "center";
+          context.textBaseline = "middle";
+          context.fillStyle = "#26332a";
+          context.font = "500 10px 'DM Mono', Consolas, monospace";
+          context.fillText(node.name, point.x, point.y - 6, nodeWidth - 8);
+          context.fillStyle = "#687168";
+          context.font = "10px 'DM Mono', Consolas, monospace";
+          context.fillText(`= ${node.result}`, point.x, point.y + 10, nodeWidth - 8);
+          node.children.forEach(drawNodes);
+        }
+
+        drawNodes(state.root);
+      }
+
+      function drawSpiral() {
+        const bounds = spiralCanvas.getBoundingClientRect();
+        if (!bounds.width || !bounds.height) return;
+        const ratio = window.devicePixelRatio || 1;
+        spiralCanvas.width = Math.round(bounds.width * ratio);
+        spiralCanvas.height = Math.round(bounds.height * ratio);
+        const context = spiralCanvas.getContext("2d");
+        context.setTransform(ratio, 0, 0, ratio, 0, 0);
+        context.clearRect(0, 0, bounds.width, bounds.height);
+
+        const centerX = bounds.width / 2;
+        const centerY = bounds.height / 2 - 2;
+        let previousX = centerX;
+        let previousY = centerY;
+        let angle = 0;
+        let radius = 0;
+        const segments = 200 + Number(inputSlider.value) * 50;
+        for (let index = 1; index <= segments; index += 1) {
+          angle += 0.12;
+          radius += 0.17;
+          const x = centerX + Math.cos(angle) * radius;
+          const y = centerY + Math.sin(angle) * radius;
+          context.beginPath();
+          context.moveTo(previousX, previousY);
+          context.lineTo(x, y);
+          context.strokeStyle = `hsl(${index / segments * 360} 58% 64%)`;
+          context.lineWidth = 1.8;
+          context.stroke();
+          previousX = x;
+          previousY = y;
+        }
+
+        context.beginPath();
+        context.arc(centerX, centerY, 3.5, 0, Math.PI * 2);
+        context.fillStyle = "#fffefa";
+        context.fill();
+      }
+
+      algorithmSelect.addEventListener("change", () => {
+        stopPlayback();
+        buildExecution();
+      });
+
+      inputSlider.addEventListener("input", () => {
+        inputValue.textContent = `n = ${inputSlider.value}`;
+        stopPlayback();
+        buildExecution();
+      });
+
+      previousButton.addEventListener("click", () => changeStep(-1));
+      nextButton.addEventListener("click", () => changeStep(1));
+      playButton.addEventListener("click", () => state.timer === null ? play() : stopPlayback());
+      resetButton.addEventListener("click", () => {
+        stopPlayback();
+        state.index = 0;
+        renderStep();
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.target instanceof HTMLInputElement || event.target instanceof HTMLSelectElement || event.target instanceof HTMLButtonElement) return;
+        if (event.key === "ArrowLeft") changeStep(-1);
+        if (event.key === "ArrowRight") changeStep(1);
+        if (event.code === "Space") {
+          event.preventDefault();
+          state.timer === null ? play() : stopPlayback();
+        }
+      });
+
+      const resizeObserver = new ResizeObserver(() => {
+        drawTree(state.steps[state.index]?.activeCall);
+        drawSpiral();
+      });
+      resizeObserver.observe(treeViewport);
+      resizeObserver.observe(spiralCanvas.parentElement);
+
+      buildExecution();
+    })();
+  </script>
+</body>
+</html>
