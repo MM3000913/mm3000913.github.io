@@ -1,7 +1,9 @@
 # Welcome to My Portfolio Hello! My name is [MM3000913].
 ## Projects
 - Mini futbol: A fun little futbol game with various 1 player difficulties ranging from Easy, Medium, and Hard "named Prime Messi" as well as a 2-player mode
+- Recursion Visualizer
 - [Download football_game.py](football_game.py)
+- [Download RecursionVisualizer.java](RecursionVisualizer.java)
 ## About Me
 Click here to learn more → [About Me](about.md)
 
